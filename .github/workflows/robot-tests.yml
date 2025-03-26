@@ -2,28 +2,47 @@ name: Robot Tests
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ['main']
   pull_request:
-    branches: [ "main" ]
+    branches: ['main']
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: '3.10'
+
+      - name: Install Firefox
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y firefox
+
+      - name: Install geckodriver
+        run: |
+          wget https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz
+          tar -xzf geckodriver-v0.33.0-linux64.tar.gz
+          sudo mv geckodriver /usr/local/bin/
+          geckodriver --version
 
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install robotframework robotframework-seleniumlibrary
-          # or, if you have a requirements.txt:
-          # pip install -r requirements.txt
+          pip install robotframework robotframework-seleniumlibrary webdrivermanager
+          webdrivermanager firefox --linkpath /usr/local/bin
 
       - name: Run Robot tests
-        run: robot tests/
+        run: |
+          robot --variable BROWSER:firefox --variable HEADLESS:True tests/ --outputdir results/
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: robot-results
+          path: results/
