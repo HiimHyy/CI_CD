@@ -10,44 +10,17 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set Up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      # Install Firefox ESR (non-snap version) which works better with Selenium
-      - name: Install Firefox (ESR)
+      - name: Install Dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y software-properties-common
-          sudo add-apt-repository ppa:mozillateam/ppa
-          sudo apt-get update
-          sudo apt-get install -y firefox-esr
-          firefox-esr --version
-
-      - name: Install geckodriver
-        run: |
-          wget https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz
-          tar -xzf geckodriver-v0.33.0-linux64.tar.gz
-          sudo mv geckodriver /usr/local/bin/
-          geckodriver --version
-
-      # Use which to find the Firefox binary path
-      - name: Check Firefox binary path
-        run: |
-          which firefox-esr
-          echo "FIREFOX_BINARY=$(which firefox-esr)" >> $GITHUB_ENV
-
-      - name: Install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install robotframework robotframework-seleniumlibrary webdrivermanager
-
-      - name: Create results directory
-        run: mkdir -p results
+          pip install robotframework robotframework-seleniumlibrary
 
       # Use npm ci to install dependencies from package.json
       - name: Install npm dependencies
@@ -59,14 +32,9 @@ jobs:
           npx http-server ./docs -p 8080 &
           sleep 2  # Give server time to start
 
-      # Pass Firefox binary path to Robot Framework
-      - name: Run Robot tests with local URL
-        id: robot_tests
+      - name: Run Robot Tests in Headless Mode
         run: |
-          robot --outputdir results --variable BROWSER:firefox --variable HEADLESS:True --variable DEPLOYED_URL:http://localhost:8080/swag_labs.html --variable FIREFOX_PATH:${FIREFOX_BINARY} tests/
-        env:
-          SELENIUM_FIREFOX_BINARY: ${{ env.FIREFOX_BINARY }}
-          MOZ_HEADLESS: 1
+          robot -d results --variable BROWSER:headlesschrome --variable DEPLOYED_URL:http://localhost:8080/swag_labs.html tests/
 
       - name: Upload test results
         if: always()
@@ -80,7 +48,7 @@ jobs:
     if: success() && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Deploy to GitHub Pages
