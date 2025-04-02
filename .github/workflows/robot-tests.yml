@@ -36,6 +36,9 @@ jobs:
           pip install robotframework robotframework-seleniumlibrary webdrivermanager
           webdrivermanager firefox --linkpath /usr/local/bin
 
+      - name: Create results directory
+        run: mkdir -p results
+
       - name: Run Robot tests
         id: robot_tests
         run: |
@@ -43,7 +46,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4 # Updated from v3
+        uses: actions/upload-artifact@v4
         with:
           name: robot-results
           path: results/
@@ -59,6 +62,6 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: docs # Folder containing swag_labs.html
+          folder: docs
           branch: gh-pages
           clean: true
