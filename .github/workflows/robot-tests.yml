@@ -39,10 +39,19 @@ jobs:
       - name: Create results directory
         run: mkdir -p results
 
-      - name: Run Robot tests
+      # Serve the HTML file locally for testing
+      - name: Install HTTP server
+        run: npm install -g http-server
+
+      - name: Start HTTP server in background
+        run: |
+          http-server ./docs -p 8080 &
+          sleep 2  # Give server time to start
+
+      - name: Run Robot tests with local URL
         id: robot_tests
         run: |
-          robot --variable BROWSER:firefox --variable HEADLESS:True --outputdir results tests/
+          robot --variable BROWSER:firefox --variable HEADLESS:True --variable DEPLOYED_URL:http://localhost:8080/swag_labs.html --outputdir results tests/
 
       - name: Upload test results
         if: always()

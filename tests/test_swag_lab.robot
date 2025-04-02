@@ -6,7 +6,7 @@ Test Timeout      1 minute
 Test Setup        Set Selenium Speed    0.1
 
 *** Variables ***
-${DEPLOYED_URL}    https://hiimhyy.github.io/CI_CD/swag_labs.html
+${DEPLOYED_URL}    file://${CURDIR}/../docs/swag_labs.html
 ${HEADLESS}       False
 ${BROWSER}        firefox
 
