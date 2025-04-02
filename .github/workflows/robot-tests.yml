@@ -41,7 +41,7 @@ jobs:
 
       # Serve the HTML file locally for testing
       - name: Install HTTP server
-        run: npm install -g http-server
+        run: sudo npm install -g http-server --unsafe-perm
 
       - name: Start HTTP server in background
         run: |
