@@ -51,9 +51,15 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # New method using direct git commands
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: docs
-          branch: gh-pages
-          clean: true
+        env:
+          ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git remote set-url origin https://x-access-token:${{ secrets.ACTIONS_DEPLOY_KEY }}@github.com/${{ github.repository }}.git
+          cp -r docs/* .
+          git add .
+          git commit -m "Deploying to gh-pages"
+          git push --force origin HEAD:gh-pages
