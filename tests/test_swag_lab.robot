@@ -1,12 +1,16 @@
 *** Settings ***
 Library           SeleniumLibrary
-Suite Setup       Open Browser    https://hiimhyy.github.io/CI_CD/swag_labs.html   firefox
+Suite Setup       Run Keyword If    '${HEADLESS}' == 'True'    Open Browser    ${DEPLOYED_URL}    ${BROWSER}    options=add_argument("--headless")    ELSE    Open Browser    ${DEPLOYED_URL}    ${BROWSER}
 Suite Teardown    Close Browser
 Test Timeout      1 minute
 Test Setup        Set Selenium Speed    0.1
 
-*** Test Cases ***
+*** Variables ***
+${DEPLOYED_URL}    https://hiimhyy.github.io/CI_CD/swag_labs.html
+${HEADLESS}       False
+${BROWSER}        firefox
 
+*** Test Cases ***
 Complete Shopping Flow
     [Documentation]    Test the full shopping experience from login to checkout
     
