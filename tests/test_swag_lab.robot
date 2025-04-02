@@ -1,6 +1,6 @@
 *** Settings ***
 Library           SeleniumLibrary
-Suite Setup       Open Browser    https://cv.huytrannn.me/CI_CD/swag_labs.html    firefox
+Suite Setup       Open Browser    https://hiimhyy.github.io/CI_CD/swag_labs.html   firefox
 Suite Teardown    Close Browser
 Test Timeout      1 minute
 Test Setup        Set Selenium Speed    0.1
