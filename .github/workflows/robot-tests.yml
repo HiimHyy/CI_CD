@@ -51,7 +51,7 @@ jobs:
 
       # Use npm ci to install dependencies from package.json
       - name: Install npm dependencies
-        run: npm ci
+        run: npm i
 
       # Start http-server using npx (local installation)
       - name: Start HTTP server in background
