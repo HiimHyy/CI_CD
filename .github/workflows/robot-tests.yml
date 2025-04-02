@@ -42,7 +42,7 @@ jobs:
       - name: Run Robot tests
         id: robot_tests
         run: |
-          robot --variable BROWSER:firefox --variable HEADLESS:True tests/ --outputdir results/
+          robot --variable BROWSER:firefox --variable HEADLESS:True --outputdir results tests/
 
       - name: Upload test results
         if: always()
