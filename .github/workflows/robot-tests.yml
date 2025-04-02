@@ -18,11 +18,15 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install Firefox
+      # Install Firefox ESR (non-snap version) which works better with Selenium
+      - name: Install Firefox (ESR)
         run: |
           sudo apt-get update
-          sudo apt-get install -y firefox
-          firefox --version  # Add this line to verify Firefox installation
+          sudo apt-get install -y software-properties-common
+          sudo add-apt-repository ppa:mozillateam/ppa
+          sudo apt-get update
+          sudo apt-get install -y firefox-esr
+          firefox-esr --version
 
       - name: Install geckodriver
         run: |
@@ -31,31 +35,38 @@ jobs:
           sudo mv geckodriver /usr/local/bin/
           geckodriver --version
 
-      - name: Set Firefox binary path
-        run: echo "FIREFOX_BIN=$(which firefox)" >> $GITHUB_ENV # Add this line to set the Firefox binary path
+      # Use which to find the Firefox binary path
+      - name: Check Firefox binary path
+        run: |
+          which firefox-esr
+          echo "FIREFOX_BINARY=$(which firefox-esr)" >> $GITHUB_ENV
 
       - name: Install dependencies
         run: |
           pip install --upgrade pip
           pip install robotframework robotframework-seleniumlibrary webdrivermanager
-          webdrivermanager firefox --linkpath /usr/local/bin
 
       - name: Create results directory
         run: mkdir -p results
 
-      # Serve the HTML file locally for testing
-      - name: Install HTTP server
-        run: sudo npm install -g http-server --unsafe-perm
+      # Use npm ci to install dependencies from package.json
+      - name: Install npm dependencies
+        run: npm ci
 
+      # Start http-server using npx (local installation)
       - name: Start HTTP server in background
         run: |
-          http-server ./docs -p 8080 &
+          npx http-server ./docs -p 8080 &
           sleep 2  # Give server time to start
 
+      # Pass Firefox binary path to Robot Framework
       - name: Run Robot tests with local URL
         id: robot_tests
         run: |
-          robot --variable BROWSER:firefox --variable HEADLESS:True --variable DEPLOYED_URL:http://localhost:8080/swag_labs.html --outputdir results tests/
+          robot --outputdir results --variable BROWSER:firefox --variable HEADLESS:True --variable DEPLOYED_URL:http://localhost:8080/swag_labs.html --variable FIREFOX_PATH:${FIREFOX_BINARY} tests/
+        env:
+          SELENIUM_FIREFOX_BINARY: ${{ env.FIREFOX_BINARY }}
+          MOZ_HEADLESS: 1
 
       - name: Upload test results
         if: always()

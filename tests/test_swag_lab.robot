@@ -1,14 +1,15 @@
 *** Settings ***
 Library           SeleniumLibrary
-Suite Setup       Run Keyword If    '${HEADLESS}' == 'True'    Open Browser    ${DEPLOYED_URL}    ${BROWSER}    options=add_argument("--headless")    ELSE    Open Browser    ${DEPLOYED_URL}    ${BROWSER}
+Suite Setup       Run Keyword If    '${HEADLESS}' == 'True'    Open Browser    ${DEPLOYED_URL}    ${BROWSER}    options=add_argument("--headless");add_argument("--no-sandbox");binary_location=${FIREFOX_PATH}    ELSE    Open Browser    ${DEPLOYED_URL}    ${BROWSER}
 Suite Teardown    Close Browser
 Test Timeout      1 minute
 Test Setup        Set Selenium Speed    0.1
 
 *** Variables ***
 ${DEPLOYED_URL}    file://${CURDIR}/../docs/swag_labs.html
-${HEADLESS}       False
-${BROWSER}        firefox
+${HEADLESS}        False
+${BROWSER}         firefox
+${FIREFOX_PATH}    /usr/bin/firefox
 
 *** Test Cases ***
 Complete Shopping Flow
