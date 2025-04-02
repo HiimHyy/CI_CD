@@ -22,6 +22,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y firefox
+          firefox --version  # Add this line to verify Firefox installation
 
       - name: Install geckodriver
         run: |
@@ -29,6 +30,9 @@ jobs:
           tar -xzf geckodriver-v0.33.0-linux64.tar.gz
           sudo mv geckodriver /usr/local/bin/
           geckodriver --version
+
+      - name: Set Firefox binary path
+        run: echo "FIREFOX_BIN=$(which firefox)" >> $GITHUB_ENV # Add this line to set the Firefox binary path
 
       - name: Install dependencies
         run: |
